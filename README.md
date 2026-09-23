@@ -1,8 +1,6 @@
 # LLM-Based Kubernetes Autoscaling — Paper Artifact
 
-Data, code, and reproduction scripts for the tables and figures in *"From
-Training to Reasoning: LLMs as Closed-Loop Controllers for Cloud
-Autoscaling"* (under review).
+Data, code, and reproduction scripts for the tables and figures in *"Tell the LLM What You Want: Intent-Driven Kubernetes Autoscaling"*
 
 This repository is scoped to exactly what the paper reports: six open-weight
 LLMs (Llama-8B, Llama-70B, Mistral-Small, GPT-OSS-120B, Qwen3-80B,
