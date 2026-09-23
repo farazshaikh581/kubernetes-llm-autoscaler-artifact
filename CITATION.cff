@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "This repository accompanies a paper currently under review. Please cite it as below until a full paper citation is available."
+title: "From Training to Reasoning: LLMs as Closed-Loop Controllers for Cloud Autoscaling"
+type: software
+authors:
+  - family-names: Shaikh
+    given-names: Faraz
+  - family-names: Santos
+    given-names: José
+  - family-names: Reali
+    given-names: Gianluca
+  - family-names: Femminella
+    given-names: Mauro
+  - family-names: De Turck
+    given-names: Filip
+repository-code: "https://github.com/farazshaikh581/kubernetes-llm-autoscaler-artifact"
+license: CC-BY-4.0
