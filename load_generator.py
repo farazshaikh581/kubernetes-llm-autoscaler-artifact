@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """Trace-driven HTTP load generator for K8s autoscaling experiments.
 
-Replays an Alibaba-derived RPS trace against a Kubernetes service,
+Replays an Alibaba-derived request-rate trace against a Kubernetes service,
 adjusting concurrency each step to match target request rate.
+
+Units: each trace value is a rate in requests PER MINUTE, not per second.
+The CSV columns are still named target_rps and actual_rps, but both hold
+requests per minute.
 
 Usage:
   python load_generator.py --service-ip 10.43.190.237 --trace traces/trace_cpu.npy \
       --steps 60 --interval 60 --output load_results/cpu_load.csv
 
 Each step (default 60s):
-  1. Read target RPS from trace
+  1. Read the target rate (requests per minute) from trace
   2. Fire requests at that rate for the step duration
-  3. Record actual RPS achieved, latency percentiles, success rate
+  3. Record actual rate achieved (requests per minute), latency percentiles, success rate
 """
 
 import argparse
@@ -65,8 +69,8 @@ def send_request(url: str, pool_size: int, timeout: float = 5.0) -> tuple[bool, 
 
 def run_step(url: str, target_rps: int, duration_s: int,
              max_workers: int = 50) -> dict:
-    """Send requests at target_rps requests/second for duration_s seconds."""
-    total_requests = target_rps * duration_s
+    """Send requests at target_rps requests per minute for duration_s seconds."""
+    total_requests = target_rps * duration_s // 60  # requests per minute -> total for this step
     total_requests = max(1, total_requests)
 
     interval = duration_s / total_requests  # time between request launches
@@ -107,7 +111,7 @@ def run_step(url: str, target_rps: int, duration_s: int,
 
     n = len(latencies)
     return {
-        "actual_rps": round(n / elapsed, 1),  # actual requests/second achieved
+        "actual_rps": round(n / elapsed * 60),  # actual requests per minute achieved
         "latency_mean_ms": round(np.mean(latencies), 1),
         "latency_p50_ms": round(latencies[int(n * 0.50)], 1),
         "latency_p90_ms": round(latencies[int(n * 0.90)], 1),
@@ -130,7 +134,7 @@ def main():
                              "falls short of target_rps at high trace rates")
     parser.add_argument("--output", type=str, default=None)
     parser.add_argument("--scale-factor", type=float, default=1.0,
-                        help="Multiply trace RPS by this factor (for resource-constrained setups)")
+                        help="Multiply the trace rate by this factor (for resource-constrained setups)")
     args = parser.parse_args()
 
     trace = np.load(args.trace)[:args.steps]

@@ -18,7 +18,7 @@ part of this paper.
 ├── load_generator.py       # Trace-driven HTTP load generator
 ├── autoscale_env.py / _v2.py   # RL (DQN/PPO) training environment
 ├── train_rl.py / train_rl_v2.py # RL training and evaluation
-├── extract_workload_traces.py   # Alibaba Cluster Trace 2018 -> RPS trace
+├── extract_workload_traces.py   # Alibaba Cluster Trace 2018 -> request-rate trace
 ├── requirements.txt
 ├── api_keys.conf.example
 │
@@ -34,6 +34,15 @@ part of this paper.
 │
 └── plot_noms_fig_*.py      # Scripts that regenerate the paper's figures/tables from the above
 ```
+
+## Units of the load trace
+
+Trace values are requests **per minute**, not per second. `load_generator.py`
+sends `value * interval / 60` requests in each step. The `cpu_bursty` trace
+runs from 200 to 1,764 requests per minute (3.3 to 29.4 requests per second).
+For historical reasons the names `target_rps`, `actual_rps`, `rps_target` and
+"Target RPS" in the code, CSVs and LLM prompt all hold requests per minute.
+The KEDA baseline applies its threshold of 50 to this per-minute value.
 
 ## Reproducing the paper's figures and tables from the included data
 
